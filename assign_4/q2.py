@@ -1,6 +1,3 @@
-"""
-Question 2: Shape Analysis on Human Cardiac Shapes
-"""
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -18,15 +15,6 @@ from utils.io_utils import (
 )
 
 def modified_plot_pointsets(pointsets, title='Pointsets', save_path=None, colors=None):
-    """
-    Plot multiple pointsets with random colors, treating each pointset as having two separate rings.
-    
-    Args:
-        pointsets: List of (N, 2) arrays of 2D points
-        title: Plot title
-        save_path: Path to save the figure
-        colors: List of colors (if None, random colors are generated)
-    """
     plt.figure(figsize=(8, 8))
     
     if colors is None:
@@ -59,15 +47,6 @@ def modified_plot_pointsets(pointsets, title='Pointsets', save_path=None, colors
         plt.show()
 
 def modified_plot_mean_and_aligned(mean_shape, aligned_shapes, title='Mean and Aligned Shapes', save_path=None):
-    """
-    Plot mean shape and aligned shapes, treating each shape as having two separate rings.
-    
-    Args:
-        mean_shape: (N, 2) array of mean shape
-        aligned_shapes: List of aligned (N, 2) arrays
-        title: Plot title
-        save_path: Path to save the figure
-    """
     plt.figure(figsize=(8, 8))
     
     # Plot aligned shapes
@@ -110,16 +89,6 @@ def modified_plot_mean_and_aligned(mean_shape, aligned_shapes, title='Mean and A
         plt.show()
 
 def modified_plot_mean_and_variations(mean_shape, aligned_shapes, variations, title='Mean and Variations', save_path=None):
-    """
-    Plot mean shape, aligned shapes, and shape variations, treating each shape as having two separate rings.
-    
-    Args:
-        mean_shape: (N, 2) array of mean shape
-        aligned_shapes: List of aligned (N, 2) arrays
-        variations: List of tuples (pos_var, neg_var) for each mode
-        title: Plot title
-        save_path: Path to save the figure
-    """
     n_modes = len(variations)
     fig, axes = plt.subplots(1, n_modes, figsize=(6 * n_modes, 6))
     
@@ -190,17 +159,6 @@ def modified_plot_mean_and_variations(mean_shape, aligned_shapes, variations, ti
         plt.show()
 
 def extract_cardiac_boundary_points(segmentation, n_points=40):
-    """
-    Extract boundary points from a cardiac segmentation image, 
-    ensuring both inner and outer boundaries are identified.
-    
-    Args:
-        segmentation: (H, W) array of segmentation
-        n_points: Total number of points to extract (will be split between boundaries)
-        
-    Returns:
-        points: (N, 2) array of boundary points
-    """
     # Threshold the image
     binary = (segmentation > 0.5).astype(np.uint8)
     

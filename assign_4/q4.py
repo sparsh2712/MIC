@@ -1,6 +1,4 @@
-"""
-Question 4: Kernel PCA to Model Variation in Object Segmentations
-"""
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt

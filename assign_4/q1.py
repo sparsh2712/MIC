@@ -1,6 +1,3 @@
-"""
-Question 1: Shape Analysis on Human Hand Shapes
-"""
 import os
 import numpy as np
 import matplotlib.pyplot as plt
