@@ -4,9 +4,10 @@ import numpy as np
 import cv2
 from skimage import util
 
-def add_gaussian_noise(image, mean=0, sigma=25):
-    noise = np.random.normal(mean, sigma, image.shape).astype(np.uint8)
-    noisy_image = cv2.add(image, noise)
+def add_gaussian_noise(image, mean=0, sigma=15):
+    noise = np.random.normal(mean, sigma, image.shape).astype(np.float64)
+    noisy_image_float = image.astype(np.float64) + noise
+    noisy_image = np.clip(noisy_image_float, 0, 255).astype(np.uint8)
     return noisy_image, "gaussian"
 
 def add_salt_pepper_noise(image, amount=0.05):

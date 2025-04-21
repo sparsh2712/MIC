@@ -1,29 +1,28 @@
-import sys
 import os
 import cv2
 import numpy as np
 import pandas as pd
-
-# Add project root to Python path to fix import issues
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
-sys.path.append(project_root)
-
 from utils.base_denoiser import BaseDenoiser
 
-class MeanFilterDenoiser(BaseDenoiser):
+class MedianFilterDenoiser(BaseDenoiser):
     def __init__(self, kernel_size=3):
-        super().__init__(f"MeanFilter_{kernel_size}x{kernel_size}")
+        super().__init__(f"MedianFilter_{kernel_size}x{kernel_size}")
         self.kernel_size = kernel_size
     
     def denoise(self, noisy_image):
-        return cv2.blur(noisy_image, (self.kernel_size, self.kernel_size))
+        # OpenCV's medianBlur requires kernel_size to be odd and > 1
+        if self.kernel_size % 2 == 0:
+            kernel_size = self.kernel_size + 1
+        else:
+            kernel_size = self.kernel_size
+            
+        return cv2.medianBlur(noisy_image, kernel_size)
 
 if __name__ == "__main__":
-    data_dir = os.path.join(project_root, "data")
+    data_dir = os.path.join("data")
     test_noisy_dir = os.path.join(data_dir, "test_imgs/noisy_imgs")
     test_clean_dir = os.path.join(data_dir, "test_imgs/clean_imgs")
-    base_output_dir = os.path.join(project_root, "results/mean_filter")
+    base_output_dir = os.path.join("results/median_filter")
     combined_results_csv = os.path.join(base_output_dir, "combined_results.csv")
     
     kernel_sizes = [3, 5, 7]
@@ -37,7 +36,7 @@ if __name__ == "__main__":
         # Create specific results file for this kernel size
         kernel_results_csv = os.path.join(kernel_output_dir, "results.csv")
         
-        denoiser = MeanFilterDenoiser(kernel_size=kernel_size)
+        denoiser = MedianFilterDenoiser(kernel_size=kernel_size)
         results = denoiser.batch_process(test_noisy_dir, test_clean_dir, kernel_output_dir)
         
         if not results.empty:
@@ -45,7 +44,7 @@ if __name__ == "__main__":
             results.to_csv(kernel_results_csv, index=False)
             
             # Print individual kernel summary
-            print(f"Mean Filter {kernel_size}x{kernel_size} Results:")
+            print(f"Median Filter {kernel_size}x{kernel_size} Results:")
             summary = results.groupby(['NoiseType']).mean(numeric_only=True)
             print(summary[['PSNR', 'SSIM', 'Time']])
             print("-" * 50)
@@ -61,7 +60,7 @@ if __name__ == "__main__":
         combined_results = pd.concat(all_results)
         combined_results.to_csv(combined_results_csv, index=False)
         
-        print("Overall Mean Filter Denoising Results:")
+        print("Overall Median Filter Denoising Results:")
         summary = combined_results.groupby(['DenoiserName', 'NoiseType']).mean(numeric_only=True)
         print(summary[['PSNR', 'SSIM', 'Time']])
     else:

@@ -12,6 +12,7 @@ dependencies = [
     "pandas>=2.2.3",
     "pillow>=11.1.0",
     "pydicom>=3.0.1",
+    "pywavelets>=1.8.0",
     "scikit-image>=0.25.2",
     "scikit-learn>=1.6.1",
     "scipy>=1.15.2",
