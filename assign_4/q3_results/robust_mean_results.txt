@@ -1,4 +1,0 @@
-l2_iterations: 1
-l2_final_cost: 6.325716902339876e-31
-l1_iterations: 1
-l1_final_cost: 1.0792174549674471e-15
