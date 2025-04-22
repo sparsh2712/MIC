@@ -31,9 +31,13 @@ class OptimizedBayesianMRFDenoiser(BaseDenoiser):
             if self.prior_type == "quadratic":
                 prior += np.sum(diff**2)
             elif self.prior_type == "huber":
+                # Fixed Huber prior calculation - calculate both parts separately
                 mask = np.abs(diff) <= self.gamma
-                prior += np.sum(0.5 * diff[mask]**2 + 
-                              self.gamma * (np.abs(diff[~mask]) - 0.5 * self.gamma))
+                huber_small = 0.5 * (diff[mask]**2)
+                huber_large = self.gamma * (np.abs(diff[~mask]) - 0.5 * self.gamma)
+                
+                # Add the sum of each part to the prior
+                prior += np.sum(huber_small) + np.sum(huber_large)
             elif self.prior_type == "adaptive":
                 prior += np.sum(self.gamma * np.abs(diff) - 
                               self.gamma**2 * np.log(1 + np.abs(diff)/self.gamma))
@@ -127,9 +131,9 @@ if __name__ == "__main__":
     # Parameter sets optimized for each prior type
     parameter_sets = [
         # Quadratic prior - only needs alpha (gamma not used)
-        {'prior_type': 'quadratic', 'alpha': 0.3, 'gamma': 0.0},
-        {'prior_type': 'quadratic', 'alpha': 0.5, 'gamma': 0.0},
-        {'prior_type': 'quadratic', 'alpha': 0.7, 'gamma': 0.0},
+        # {'prior_type': 'quadratic', 'alpha': 0.3, 'gamma': 0.0},
+        # {'prior_type': 'quadratic', 'alpha': 0.5, 'gamma': 0.0},
+        # {'prior_type': 'quadratic', 'alpha': 0.7, 'gamma': 0.0},
         
         # Huber prior - needs both alpha and gamma
         {'prior_type': 'huber', 'alpha': 0.5, 'gamma': 0.05},
