@@ -4,8 +4,8 @@
 DATA_DIR="data"
 CLEAN_DIR="${DATA_DIR}/clean_imgs"
 NOISY_DIR="${DATA_DIR}/noisy_imgs"
-TEST_CLEAN_DIR="${DATA_DIR}/test_imgs/clean_imgs"
-TEST_NOISY_DIR="${DATA_DIR}/test_imgs/noisy_imgs"
+TEST_CLEAN_DIR="${DATA_DIR}/dl_train_imgs/clean_imgs"
+TEST_NOISY_DIR="${DATA_DIR}/dl_train_imgs/noisy_imgs"
 
 # Create test directories if they don't exist
 mkdir -p ${TEST_CLEAN_DIR}
@@ -21,7 +21,7 @@ for noise_type in ${NOISE_TYPES}; do
     
     # Select 100 files or all if less than 100
     count=0
-    max_files=100
+    max_files=1000
     if [ ${#files[@]} -lt ${max_files} ]; then
         max_files=${#files[@]}
     fi
