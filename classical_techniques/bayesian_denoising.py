@@ -131,19 +131,19 @@ if __name__ == "__main__":
     # Parameter sets optimized for each prior type
     parameter_sets = [
         # Quadratic prior - only needs alpha (gamma not used)
-        # {'prior_type': 'quadratic', 'alpha': 0.3, 'gamma': 0.0},
-        # {'prior_type': 'quadratic', 'alpha': 0.5, 'gamma': 0.0},
-        # {'prior_type': 'quadratic', 'alpha': 0.7, 'gamma': 0.0},
+        {'prior_type': 'quadratic', 'alpha': 0.3, 'gamma': 0.0},
+        {'prior_type': 'quadratic', 'alpha': 0.5, 'gamma': 0.0},
+        {'prior_type': 'quadratic', 'alpha': 0.7, 'gamma': 0.0},
         
         # Huber prior - needs both alpha and gamma
-        {'prior_type': 'huber', 'alpha': 0.5, 'gamma': 0.05},
-        {'prior_type': 'huber', 'alpha': 0.5, 'gamma': 0.1},
-        {'prior_type': 'huber', 'alpha': 0.7, 'gamma': 0.1},
+        # {'prior_type': 'huber', 'alpha': 0.5, 'gamma': 0.05},
+        # {'prior_type': 'huber', 'alpha': 0.5, 'gamma': 0.1},
+        # {'prior_type': 'huber', 'alpha': 0.7, 'gamma': 0.1},
         
-        # Adaptive prior - needs both alpha and gamma
-        {'prior_type': 'adaptive', 'alpha': 0.5, 'gamma': 0.1},
-        {'prior_type': 'adaptive', 'alpha': 0.7, 'gamma': 0.1},
-        {'prior_type': 'adaptive', 'alpha': 0.7, 'gamma': 0.2}
+        # # Adaptive prior - needs both alpha and gamma
+        # {'prior_type': 'adaptive', 'alpha': 0.5, 'gamma': 0.1},
+        # {'prior_type': 'adaptive', 'alpha': 0.7, 'gamma': 0.1},
+        # {'prior_type': 'adaptive', 'alpha': 0.7, 'gamma': 0.2}
     ]
     
     all_results = []

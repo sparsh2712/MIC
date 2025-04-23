@@ -9,6 +9,7 @@ from sklearn.linear_model import orthogonal_mp_gram
 import scipy.sparse as sparse
 from scipy import linalg
 from time import time
+import matplotlib.pyplot as plt
 
 class OptimizedKSVDDenoiser(BaseDenoiser):
     def __init__(self, patch_size=5, n_components=32, sparsity=3, n_iter=5,
@@ -151,7 +152,55 @@ class OptimizedKSVDDenoiser(BaseDenoiser):
         
         return reconstructed
     
-    def train_global(self, clean_images_dir, max_patches=30000):
+    def visualize_dictionary(self, dictionary, output_path):
+        """Visualize dictionary atoms in a grid and save as PNG."""
+        n_atoms = dictionary.shape[0]
+        
+        # Determine grid size based on number of atoms
+        grid_size = int(np.ceil(np.sqrt(n_atoms)))
+        
+        # Create figure with appropriate size
+        plt.figure(figsize=(12, 12))
+        
+        # Normalize dictionary globally for better visualization
+        dict_min = dictionary.min()
+        dict_max = dictionary.max()
+        normalized_dict = (dictionary - dict_min) / (dict_max - dict_min + 1e-10)
+        
+        # Create a grid of dictionary atoms
+        grid_image = np.ones((grid_size * self.patch_size + grid_size - 1,
+                             grid_size * self.patch_size + grid_size - 1)) * 0.5
+        
+        # Place each atom in the grid
+        for i in range(min(n_atoms, grid_size * grid_size)):
+            row = i // grid_size
+            col = i % grid_size
+            
+            # Reshape atom to 2D patch
+            atom = normalized_dict[i].reshape(self.patch_size, self.patch_size)
+            
+            # Calculate position with 1-pixel gap between patches
+            row_pos = row * (self.patch_size + 1)
+            col_pos = col * (self.patch_size + 1)
+            
+            # Place atom in the grid
+            grid_image[row_pos:row_pos + self.patch_size, 
+                      col_pos:col_pos + self.patch_size] = atom
+        
+        # Remove axes and white space
+        plt.axis('off')
+        plt.imshow(grid_image, cmap='gray', interpolation='nearest')
+        plt.title(f'K-SVD Dictionary (p={self.patch_size}, n={self.n_components}, s={self.sparsity})', 
+                 fontsize=14)
+        plt.tight_layout(pad=0)
+        
+        # Save high-quality PNG
+        plt.savefig(output_path, dpi=300, bbox_inches='tight', pad_inches=0.1)
+        plt.close()
+        
+        print(f"Dictionary visualization saved to {output_path}")
+    
+    def train_global(self, clean_images_dir, max_patches=30000, save_dict_path=None):
         """Train global dictionary efficiently."""
         print(f"Training global dictionary on {clean_images_dir}")
         
@@ -193,6 +242,10 @@ class OptimizedKSVDDenoiser(BaseDenoiser):
         # Train K-SVD
         print(f"Training on {len(patches_normalized)} patches...")
         self.global_dictionary, _ = self.ksvd_core(patches_normalized, dictionary)
+        
+        # Save dictionary visualization if path provided
+        if save_dict_path:
+            self.visualize_dictionary(self.global_dictionary, save_dict_path)
         
         return self.global_dictionary
     
@@ -258,17 +311,36 @@ if __name__ == "__main__":
     for config_idx, config in enumerate(configs):
         print(f"\nTesting configuration {config_idx + 1}/{len(configs)}")
         
-        # Create denoiser
-        denoiser = OptimizedKSVDDenoiser(**config)
-        
-        # Train global dictionary if needed
-        if config['use_global']:
-            denoiser.train_global(train_clean_dir)
-        
-        # Create output directory
+        # Create config-specific output directory
         config_name = f"config{config_idx}_p{config['patch_size']}_n{config['n_components']}_s{config['sparsity']}"
         output_dir = os.path.join(base_output_dir, config_name)
         os.makedirs(output_dir, exist_ok=True)
+        
+        # Create dictionary visualization path
+        dict_vis_path = os.path.join(output_dir, f"dictionary_visualization.png")
+        
+        # Create denoiser
+        denoiser = OptimizedKSVDDenoiser(**config)
+        
+        # Train global dictionary if needed and save visualization
+        if config['use_global']:
+            denoiser.train_global(train_clean_dir, save_dict_path=dict_vis_path)
+        else:
+            # For local dictionary, we'll save visualization after processing the first image
+            first_image_path = sorted(glob.glob(os.path.join(test_noisy_dir, "*.png")))[0]
+            first_image = cv2.imread(first_image_path, cv2.IMREAD_GRAYSCALE)
+            if first_image is not None:
+                # Extract patches and train local dictionary
+                patches, _ = denoiser.extract_patches_fast(first_image)
+                patch_mean = np.mean(patches, axis=1, keepdims=True)
+                patch_std = np.std(patches, axis=1, keepdims=True) + 1e-8
+                patches_normalized = (patches - patch_mean) / patch_std
+                
+                dictionary = denoiser.initialize_dictionary(patches_normalized)
+                local_dict, _ = denoiser.ksvd_core(patches_normalized, dictionary, n_iter=3)
+                
+                # Save visualization
+                denoiser.visualize_dictionary(local_dict, dict_vis_path)
         
         # Process test images
         results = denoiser.batch_process(test_noisy_dir, test_clean_dir, output_dir)

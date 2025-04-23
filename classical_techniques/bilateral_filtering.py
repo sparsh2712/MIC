@@ -35,12 +35,14 @@ if __name__ == "__main__":
     
     # For medical images, test combinations that emphasize edge preservation
     test_combinations = [
-        {'diameter': 5, 'sigma_color': 25, 'sigma_space': 25},
-        {'diameter': 5, 'sigma_color': 75, 'sigma_space': 25},
-        {'diameter': 9, 'sigma_color': 50, 'sigma_space': 50},
-        {'diameter': 9, 'sigma_color': 75, 'sigma_space': 75},
-        {'diameter': 15, 'sigma_color': 75, 'sigma_space': 50},
-        {'diameter': 15, 'sigma_color': 50, 'sigma_space': 75}
+        {'diameter': 5, 'sigma_color': 25, 'sigma_space': 3},
+        {'diameter': 5, 'sigma_color': 25, 'sigma_space': 5},
+        {'diameter': 5, 'sigma_color': 50, 'sigma_space': 3},
+        {'diameter': 5, 'sigma_color': 50, 'sigma_space': 5},
+        {'diameter': 7, 'sigma_color': 25, 'sigma_space': 5},
+        {'diameter': 7, 'sigma_color': 25, 'sigma_space': 7},
+        {'diameter': 7, 'sigma_color': 50, 'sigma_space': 5},
+        {'diameter': 7, 'sigma_color': 50, 'sigma_space': 7},
     ]
     
     for params in test_combinations:
